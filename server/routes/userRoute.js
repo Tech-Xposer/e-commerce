@@ -1,11 +1,12 @@
 const express = require("express")
-const { createUser, userLogin,loadLoginPage, verifyUser, userLogout } = require("../controller/userController")
+const { createUser, userLogin, verifyUser, userLogout } = require("../controller/userController")
+const { checkLogin, isUserAlreadyLogin } = require("../middlewares/auth")
 
 const userRouter = express.Router()
 
 userRouter.post('/createuser', createUser)
 
-userRouter.route('/login').get(loadLoginPage).post(userLogin)
+userRouter.post('/login',isUserAlreadyLogin, userLogin)
 
 userRouter.delete('/logout', userLogout)
 

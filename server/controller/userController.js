@@ -80,8 +80,15 @@ const userLogin = async (req, res) => {
                 status:"FAILED",
                 message:"incorrect email"
             })
+        if(!user.isVerified){
+            return res.status(400).json({
+                status:"FAILED",
+                message:"please verify your mail first"
+            })
+        }
         const passwordCheck =  await bcrypt.compare(password, user.password)
         if(passwordCheck){
+            
             const sessionId = uuidv4();
             console.log(`SessionId ${sessionId}`);
             setUser(sessionId,user);
@@ -136,8 +143,5 @@ const verifyUser = async (req,res)=>{
     })
 }
 
-const loadLoginPage = async (req,res)=>{
-    res.sendFile(__dirname + '/login.html');
-}
 
-module.exports = { createUser, userLogin, verifyUser, userLogout, loadLoginPage }
+module.exports = { createUser, userLogin, verifyUser, userLogout }

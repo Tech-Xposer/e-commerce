@@ -3,9 +3,7 @@ const {v4: uuidv4} = require('uuid');
 const bcrypt = require('bcrypt');
 const { nodeMailer } = require('../services/nodeMailer');
 const VerificationCode = require('../model/verificationModel')
-const VerifyID = require("../model/verificationModel");
 const User = require('../model/userModel');
-const { setUser } = require('../services/auth');
 
 const createUser = async (req, res) => {
     try {
@@ -42,7 +40,7 @@ const createUser = async (req, res) => {
                 user_id: newUser._id,
                 uuid:verification_uuid
             }) 
-            const verificationLink = `http://localhost:3000/auth/activate/${verification_uuid}`;
+            const verificationLink = `http://localhost:3008/user/auth/activate/${verification_uuid}`;
             
             const verifyMail = {
                 subject: 'Email Verification | CodeWithAsh',
@@ -130,6 +128,12 @@ const deleteUser = async (req, res) => {
     }
 }
 
+const getTotalLoggedInUsers = async(req,res)=>{
+    
+    res.status(200).status({
+        status:"SUCCESSFULL"
+    });
 
+}
 
-module.exports = { createUser, getAllUsersDetails, resetPassword, deleteUser, getUserDetails }
+module.exports = { createUser, getAllUsersDetails, resetPassword, deleteUser, getUserDetails, getTotalLoggedInUsers }
