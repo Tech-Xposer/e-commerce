@@ -1,17 +1,22 @@
 const express = require('express');
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const productRoute = require('./routes/productRoute');
-const PORT = process.env.PORT || 3000;
-
+const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 dotenv.config();
+const PORT = process.env.PORT 
 
 const userRoute = require('./routes/userRoute');
-const authRouter = require('./routes/auth');
+const adminRoute = require('./routes/adminRoute');
+const { restrictToAdminOnly } = require('./middlewares/auth');
 
 const app = express();
+
 app.use(express.json() );
+app.use(cookieParser())
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req,res,next)=>{
   const text = `${Date.now()}: ${req.method} ${req.path}\n`;
@@ -20,10 +25,10 @@ app.use((req,res,next)=>{
   })
 })
 
+
 app.use('/product', productRoute);
 app.use('/user',userRoute)
-app.use('/auth', authRouter)
-
+app.use('/admin', restrictToAdminOnly, adminRoute)
 app.get('*', (req, res) => {
     return res.status(404).json({message:'404 page not found'});
 });

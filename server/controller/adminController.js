@@ -71,73 +71,65 @@ const createUser = async (req, res) => {
     }
 }
 
-const userLogin = async (req, res) => {
+const getUserDetails = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({email});
-        if(!user)
-            return res.status(400).json({
-                status:"FAILED",
-                message:"incorrect email"
-            })
-        const passwordCheck =  await bcrypt.compare(password, user.password)
-        if(passwordCheck){
-            const sessionId = uuidv4();
-            console.log(`SessionId ${sessionId}`);
-            setUser(sessionId,user);
-            res.cookie("uid",sessionId);
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ msg: "All fields are required!" })
+        }
+        const result = await User.findById(id);
+        if (result) {
             return res.status(200).json({
-                status:"SUCCESS",
-                message:"login successfull"
+                status: "SUCCESSFUL",
+                result: result
             })
         }
         return res.status(400).json({
-            status:"FAILED",
-            message:"incorrect credentials"
+            status: "FAILED",
+            message: "user not found or invalid user_id"
         })
     } catch (error) {
-        res.status(500).send('Internal Server Error')
+        return res.status(500).json({ msg: `Error: ${error.message}` })
     }
 }
 
-const userLogout = async (req,res)=>{
-    if(req.session){
-        req.session.destroy();
-        
-        res.status(200).json({
-            status:"SUCCESS",
-            message:"logout successfully"
-        })
-    }
-    res.status(400).json({
-        status:"FAILED",
-        message:"unable to logout"
+const getAllUsersDetails = async (req, res) => {
+    result = await User.find();
+    return res.status(200).json({
+        status: "SUCCESS",
+        total_users: result.length,
+        data: result
     })
 }
 
-const verifyUser = async (req,res)=>{
-    const {uuid} = req.params;
-    const verificationDetails = await VerifyID.findOne({uuid});
-     
-    if(!verificationDetails){
-        return res.status(404).json({
-            status:"FAILED",
-            message:"already verified or invalid link"
+const resetPassword = async (req, res) => {
+
+}
+
+
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ msg: "All fields are required!" })
+        }
+        const result = await User.findByIdAndDelete(id);
+        if (result) {
+            return res.status(200).json({
+                status: "SUCCESS",
+                message: "user deleted",
+                result: {email:result.email, name: result.name}
+            })
+        }
+        return res.status(400).json({
+            status: "FAILED",
+            message: "user not found"
         })
+    } catch (error) {
+        return res.status(500).json({ msg: `Error: ${error.message}` })
     }
-    const user_id = verificationDetails.user_id;
-
-    const result = await User.findByIdAndUpdate(user_id,{isVerified:true});
-    if(result) await VerifyID.deleteOne({uuid});
-    res.status(200).json({
-        status:"SUCCESS",
-        messgae:"user verified successfully",
-        
-    })
 }
 
-const loadLoginPage = async (req,res)=>{
-    res.sendFile(__dirname + '/login.html');
-}
 
-module.exports = { createUser, userLogin, verifyUser, userLogout, loadLoginPage }
+
+module.exports = { createUser, getAllUsersDetails, resetPassword, deleteUser, getUserDetails }
