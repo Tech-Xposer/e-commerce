@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const { nodeMailer } = require('../services/nodeMailer');
 const VerificationCode = require('../model/verificationModel')
 const User = require('../model/userModel');
+const { totalLoggedInUsers } = require('../services/auth');
 
 const createUser = async (req, res) => {
     try {
@@ -129,9 +130,13 @@ const deleteUser = async (req, res) => {
 }
 
 const getTotalLoggedInUsers = async(req,res)=>{
+    const result = totalLoggedInUsers();
     
-    res.status(200).status({
-        status:"SUCCESSFULL"
+    console.log(result);
+    res.status(200).json({
+        status:"SUCCESSFULL",
+        total_users:result.length,
+        current_users:result
     });
 
 }

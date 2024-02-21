@@ -1,19 +1,15 @@
-const sessionToUserMap = new Map();
+const jwt = require('jsonwebtoken');
 
-const setUser = (id, user) => {
-    sessionToUserMap.set(id, user);
-
+const createToken = (_id, email, name)=>{
+    return jwt.sign({
+        _id
+    },
+    process.env.APP_SECRET,
+    {expiresIn:"7d"})
 }
 
-const getUser = (id) => {
-    return sessionToUserMap.get(id);
+const verifyToken = (token)=>{
+    return jwt.verify(token, process.env.APP_SECRET)
 }
 
-function removeUser(id) {
-    sessionToUserMap.delete(id);
-}
-
-module.exports = {
-    setUser,
-    getUser
-};
+module.exports= {createToken, verifyToken}

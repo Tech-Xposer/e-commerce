@@ -5,7 +5,7 @@ const { nodeMailer } = require('../services/nodeMailer');
 const VerificationCode = require('../model/verificationModel')
 const VerifyID = require("../model/verificationModel");
 const User = require('../model/userModel');
-const { setUser } = require('../services/auth');
+const { createToken, verifyToken } = require('../services/auth');
 
 const createUser = async (req, res) => {
     try {
@@ -27,7 +27,8 @@ const createUser = async (req, res) => {
             status:"FAILED",
             message:"user already registered!"
         })
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt)
         console.log(`Hashed Password: ${hashedPassword}`);
         const newUser = await User.create({
             name,
@@ -73,6 +74,7 @@ const createUser = async (req, res) => {
 
 const userLogin = async (req, res) => {
     try {
+        
         const { email, password } = req.body;
         const user = await User.findOne({email});
         if(!user)
@@ -88,15 +90,14 @@ const userLogin = async (req, res) => {
         }
         const passwordCheck =  await bcrypt.compare(password, user.password)
         if(passwordCheck){
-            
-            const sessionId = uuidv4();
-            console.log(`SessionId ${sessionId}`);
-            setUser(sessionId,user);
-            res.cookie("uid",sessionId);
-            return res.status(200).json({
-                status:"SUCCESS",
-                message:"login successfull"
-            })
+            const token = createToken(user._id);
+            console.log('Token: ',token);
+            if(token)
+                return res.status(200).send({
+                    status:"SUCCESSFULL",
+                    message:"login successfully",
+                    token:token
+                })
         }
         return res.status(400).json({
             status:"FAILED",

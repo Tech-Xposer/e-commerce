@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const verificationSchema = mongoose.Schema({
     user_id:{
         type:mongoose.SchemaTypes.ObjectId ,
+        ref:'user',
         required:true
     },
     uuid:{

@@ -7,9 +7,10 @@ adminRouter.post('/createuser', createUser);
 
 adminRouter.get('/allusers',getAllUsersDetails);
 
+adminRouter.get('/totalcurrentusers', getTotalLoggedInUsers);
+
 adminRouter.route('/:id').get(getUserDetails).patch(resetPassword).delete(deleteUser);
 
-adminRouter.get('/totalcurrentusers', getTotalLoggedInUsers)
 
 
 module.exports = adminRouter;

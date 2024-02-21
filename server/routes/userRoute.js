@@ -1,14 +1,13 @@
-const express = require("express")
-const { createUser, userLogin, verifyUser, userLogout } = require("../controller/userController")
-const { checkLogin, isUserAlreadyLogin } = require("../middlewares/auth")
+const express = require("express");
+const { createUser, userLogin, verifyUser, userLogout } = require("../controller/userController");
 
 const userRouter = express.Router()
+;
+userRouter.post('/createuser', createUser);
 
-userRouter.post('/createuser', createUser)
+userRouter.post('/login', userLogin);
 
-userRouter.post('/login',isUserAlreadyLogin, userLogin)
-
-userRouter.delete('/logout', userLogout)
+userRouter.delete('/logout', userLogout);
 
 userRouter.get("/auth/activate/:uuid",verifyUser);
 
